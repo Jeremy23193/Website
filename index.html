@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Recettes de Cuisine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #d35400;
+        }
+        form {
+            max-width: 400px;
+            margin: auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f8f8f8;
+        }
+        label, input, textarea {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background: #d35400;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .recette {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📖 Mes Recettes</h1>
+
+    <form id="recetteForm">
+        <label for="nom">Nom de la recette :</label>
+        <input type="text" id="nom" required>
+
+        <label for="ingredients">Ingrédients (séparés par une virgule) :</label>
+        <textarea id="ingredients" required></textarea>
+
+        <label for="temps">Temps de cuisson (minutes) :</label>
+        <input type="number" id="temps" required>
+
+        <label for="instructions">Instructions :</label>
+        <textarea id="instructions" required></textarea>
+
+        <button type="submit">Ajouter la recette</button>
+    </form>
+
+    <h2>📌 Recettes enregistrées</h2>
+    <div id="recettesContainer"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("recetteForm");
+            const recettesContainer = document.getElementById("recettesContainer");
+
+            // Charger les recettes enregistrées
+            function chargerRecettes() {
+                recettesContainer.innerHTML = "";
+                const recettes = JSON.parse(localStorage.getItem("recettes")) || [];
+                
+                recettes.forEach((recette, index) => {
+                    const recetteDiv = document.createElement("div");
+                    recetteDiv.classList.add("recette");
+                    recetteDiv.innerHTML = `
+                        <h3>${recette.nom}</h3>
+                        <p><strong>Ingrédients:</strong> ${recette.ingredients.join(", ")}</p>
+                        <p><strong>Temps de cuisson:</strong> ${recette.temps} min</p>
+                        <p><strong>Instructions:</strong> ${recette.instructions}</p>
+                        <button onclick="supprimerRecette(${index})">🗑 Supprimer</button>
+                    `;
+                    recettesContainer.appendChild(recetteDiv);
+                });
+            }
+
+            // Ajouter une nouvelle recette
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+
+                const nom = document.getElementById("nom").value;
+                const ingredients = document.getElementById("ingredients").value.split(",");
+                const temps = document.getElementById("temps").value;
+                const instructions = document.getElementById("instructions").value;
+
+                const recette = { nom, ingredients, temps, instructions };
+
+                let recettes = JSON.parse(localStorage.getItem("recettes")) || [];
+                recettes.push(recette);
+                localStorage.setItem("recettes", JSON.stringify(recettes));
+
+                form.reset();
+                chargerRecettes();
+            });
+
+            // Supprimer une recette
+            window.supprimerRecette = (index) => {
+                let recettes = JSON.parse(localStorage.getItem("recettes")) || [];
+                recettes.splice(index, 1);
+                localStorage.setItem("recettes", JSON.stringify(recettes));
+                chargerRecettes();
+            };
+
+            // Charger les recettes au démarrage
+            chargerRecettes();
+        });
+    </script>
+
+</body>
+</html>
